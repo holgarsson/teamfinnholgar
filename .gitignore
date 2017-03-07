@@ -107,6 +107,8 @@ csx
 AppPackages/
 
 # Others
+*.VC.opendb
+*.VC.db
 sql/
 *.Cache
 ClientBin/
