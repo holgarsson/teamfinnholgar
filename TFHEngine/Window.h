@@ -12,7 +12,7 @@ public:
 
 	int create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentFlags);
 
-	void swapBuffer();
+	//void swapBuffer();
 
 	int getScreenWidth();
 	int getScreenHeight();

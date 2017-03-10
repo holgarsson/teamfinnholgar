@@ -1,11 +1,23 @@
 #pragma once
+#include <time.h>
+#include <vector>
+#include <memory>
+
 #include "Window.h"
+#include "SpriteManager.h"
 #include "InputManager.h"
 #include "AudioManager.h"
 #include "FpsLimiter.h"
-
+#include "GameObject.h"
 #include "Texture.h"
-#include "TextureFromSpritesheet.h"
+
+
+enum GameStates
+{
+	MENU,
+	PLAYING,
+	GAME_OVER
+};
 
 class MainGame
 {
@@ -14,31 +26,50 @@ public:
 	~MainGame();
 
 	void init();
+
+	bool loadAudio();
+	void loadSprites();
+	void loadGameObjects();
+
 	void run();
 	void processInput();
+	void update();
+	void checkCollision();
 	void render();
-	bool loadSprites();
-	bool loadSpritesFromSpritesheet();
+	void resetPlayer();
+	void resetPipes();
+
 
 private:
+	bool passedPipe;
+	bool passedPipe2;
+	bool godMode;
+	int score;
+	float gameSpeed;
+	float gravity;
+	float acceleration;
+	float maxAcceleration;
+
+	// game variables
 	bool running;
-	Window window;
+	GameStates state;
+
+	// Engine functionality
+	Window window;	// gera ein enum wrappara til Window FLAGS
+	SpriteManager spriteManager;
 	InputManager inputManager;
 	AudioManager audioManager;
 	FpsLimiter limiter;
-	SDL_Renderer* Renderer;
+	
+	// Gameobjects høvdu eventuelt kunna veri í world/lvl klassa
+	GameObject player;
+	GameObject pipeTop;
+	GameObject pipeBottom;
+	GameObject pipeTop2;
+	GameObject pipeBottom2;
 
-	int stickManPosX;
-	int stickManPosY;
+	// vector of objects that are to be rendered each iteration
+	std::vector<GameObject>renderables;
 
-
-	// temporary - fer í spritemanager
-	// sprites from images
-	Texture stickMan;
-	Texture background;
-
-	// sprites from sheet
-	SDL_Rect gSpriteClips[4];		//Scene sprite
-	TextureFromSpritesheet gSpriteSheetTexture;	//Scene sprite
 };
 

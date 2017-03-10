@@ -1,17 +1,22 @@
 #include "Window.h"
 #include "Errors.h"
 
+// constructor
 Window::Window()
 {
+	// Set texture filtering to linear
+	if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
+		printf("Warning: Linear texture filtering not enabled!");
+	}
 }
 
-
-Window::~Window()
-{
+// destructor
+Window::~Window(){
 	SDL_DestroyWindow(_sdlWindow);
+	SDL_Quit();
 }
 
-
+// creates a new window
 int Window::create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentFlags){
 	_screenWidth = screenWidth;
 	_screenHeight = screenHeight;
@@ -41,15 +46,10 @@ int Window::create(std::string windowName, int screenWidth, int screenHeight, un
 	}
 
 	// Set VSYNC (1 = VSYNC on, 0 = VSYNC off)
-	SDL_GL_SetSwapInterval(0);
+	SDL_GL_SetSwapInterval(1);
 
 	
 	return 0;
-}
-
-void Window::swapBuffer(){
-	// swap buffer and draw everything on screen
-	SDL_GL_SwapWindow(_sdlWindow);
 }
 
 
