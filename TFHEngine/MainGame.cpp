@@ -17,7 +17,7 @@ MainGame::MainGame()
 	godMode = false;
 
 	// create a window
-	window.create("Alpha Engine", 400, 500, SDL_WINDOW_SHOWN);
+	window.create("Alpha Engine", 400, 500, SHOWN);
 	spriteManager = SpriteManager(&window);
 }
 

@@ -2,7 +2,9 @@
 #include <SDL.h>
 #include <string>
 
-enum WindowFlags{ INVISIBLE = 0x1, FULLSCREEN = 0x2, BORDERLESS = 0x4 };
+enum WindowFlags{ INVISIBLE = 0x8, FULLSCREEN = 0x1, BORDERLESS = 0x10, SHOWN = 0x4};
+
+
 
 class Window
 {
