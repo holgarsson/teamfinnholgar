@@ -39,8 +39,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)TFHEngine\dependencies\SDL_Mixer\include;$(SolutionDir)TFHEngine\dependencies\SDL_Image\include;$(SolutionDir)TFHEngine\dependencies\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)TFHEngine\dependencies\SDL_Mixer\lib\x86;$(SolutionDir)TFHEngine\dependencies\SDL_Image\lib\x86;$(SolutionDir)TFHEngine\dependencies\SDL\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)TFHEngine\dependencies\SDL_Mixer\include;$(SolutionDir)TFHEngine\dependencies\SDL_Image\include;$(SolutionDir)TFHEngine\dependencies\SDL2_ttf\include;$(SolutionDir)TFHEngine\dependencies\SDL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)TFHEngine\dependencies\SDL2_ttf\lib\x86;$(SolutionDir)TFHEngine\dependencies\SDL_Mixer\lib\x86;$(SolutionDir)TFHEngine\dependencies\SDL_Image\lib\x86;$(SolutionDir)TFHEngine\dependencies\SDL\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -50,7 +50,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -71,6 +71,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Errors.cpp" />
     <ClCompile Include="FpsLimiter.cpp" />
@@ -85,6 +86,7 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Errors.h" />
     <ClInclude Include="FpsLimiter.h" />

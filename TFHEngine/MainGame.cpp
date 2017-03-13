@@ -5,30 +5,29 @@
 // constructor
 MainGame::MainGame()
 {
+	// set game variables
 	state = MENU;
 	running = true;
-	gravity = -0.3;
+	gravity = -0.8;
 	acceleration = 0;
-	gameSpeed = 3.3;
-	maxAcceleration = 5;
+	gameSpeed = 6;
+	maxAcceleration = 10;
 	score = 0;
 	passedPipe = false;
 	passedPipe2 = false;
 	godMode = false;
 
-	// create a window
-	window.create("Alpha Engine", 400, 500, SHOWN);
+	// create a window and pass it to the spritemanager
+	window.create("Flappy Bird", 400, 500, SHOWN);
 	spriteManager = SpriteManager(&window);
 }
 
 // destructor
 MainGame::~MainGame() {
-	window.~Window();
-	audioManager.~AudioManager();
-	spriteManager.~SpriteManager();
-
-	//Destroy window	
-	window.~Window();
+	// destroy objects
+	window.close();
+	audioManager.close();
+	spriteManager.close();
 }
 
 // initialise systems/variables
@@ -36,30 +35,31 @@ void MainGame::init() {
 	bool success = true;
 
 	loadGameObjects();
+	loadSprites();
+	loadFonts();
 
 	if (!loadAudio()) {
 		success = false;
 		printf("Failed to load audio!");
 	}
 
-	loadSprites();
-
 	resetPlayer();
 	resetPipes();
 }
 
+// initialise game objects and related variables
 void MainGame::loadGameObjects() {
-	player = GameObject("player", window.getScreenWidth() / 8, window.getScreenHeight() / 2, true, PLAYER);
-	
+	player = GameObject("player", window.getScreenWidth() / 8, window.getScreenHeight() / 2, 0, true, PLAYER);
+
 	// seed random number for the height of the pipes
 	srand(time(NULL));
 	int newHeight = rand() % 200 + 150;
-	pipeTop = GameObject("pipeTop", window.getScreenWidth(), -newHeight, true, FOREGROUND);
-	pipeBottom = GameObject("pipeBottom", window.getScreenWidth(), -newHeight + 500, true, FOREGROUND);
+	pipeTop = GameObject("pipeTop", window.getScreenWidth(), -newHeight, 0.0, true, FOREGROUND);
+	pipeBottom = GameObject("pipeBottom", window.getScreenWidth(), -newHeight + 500, 0.0, true, FOREGROUND);
 
 	newHeight = rand() % 200 + 150;
-	pipeTop2 = GameObject("pipeTop2", pipeTop.getPosX() + 300, -newHeight, true, FOREGROUND);
-	pipeBottom2 = GameObject("pipeBottom2", pipeTop.getPosX() + 300, -newHeight + 500, true, FOREGROUND);
+	pipeTop2 = GameObject("pipeTop2", pipeTop.getPosX() + 300, -newHeight, 0.0, true, FOREGROUND);
+	pipeBottom2 = GameObject("pipeBottom2", pipeTop.getPosX() + 300, -newHeight + 500, 0.0, true, FOREGROUND);
 
 	passedPipe = false;
 	passedPipe2 = false;
@@ -70,47 +70,84 @@ bool MainGame::loadAudio() {
 	bool success = true;
 
 	// load soundEffects
-	if (!audioManager.loadSoundEffect("scratch", "scratch.wav")) { success = false; }
-	if (!audioManager.loadSoundEffect("high", "high.wav")) { success = false; }
-	if (!audioManager.loadSoundEffect("medium", "medium.wav")) { success = false; }
-	if (!audioManager.loadSoundEffect("low", "low.wav")) { success = false; }
+	if (!audioManager.loadSoundEffect("death", "Audio/select1.wav")) { success = false; }
+	if (!audioManager.loadSoundEffect("next", "Audio/select3b.wav")) { success = false; }
+	if (!audioManager.loadSoundEffect("coin", "Audio/smw_coin.wav")) { success = false; }
 
 	// load Music
-	if (!audioManager.loadSong("beat", "beat.wav")) { success = false; }
+	if (!audioManager.loadSong("Kids_Music_3", "Audio/Kids_Music_3.wav")) { success = false; }
+
+	// set the volume
+	audioManager.setSoundFXVolume(1, 128);
+	audioManager.setMusicVolume(20);
+	audioManager.playSong("Kids_Music_3");
 
 	return success;
 }
 
 // load Sprites
-void MainGame::loadSprites() {	
-	spriteManager.newSprite("background", "sheet.png", 275, 111, 0, 0);
-	spriteManager.newSprite("ground", "sheet.png", 225, 110, 275, 0);
-	spriteManager.newSprite("pipeTop", "sheet.png", 54, 400, 552, 0);
-	spriteManager.newSprite("pipeBottom", "sheet.png", 52, 400, 502, 0);
-	spriteManager.newSprite("pipeTop2", "sheet.png", 54, 400, 552, 0);
-	spriteManager.newSprite("pipeBottom2", "sheet.png", 52, 400, 502, 0);
+void MainGame::loadSprites() {
+	spriteManager.newSprite("player", "Sprites/sheet.png", 34, 24, 311, 230);
+	spriteManager.newSprite("player2", "Sprites/sheet.png", 34, 24, 311, 256);
+	spriteManager.newSprite("player3", "Sprites/sheet.png", 34, 24, 311, 282);
 
-	spriteManager.newSprite("player", "sheet.png", 34, 24, 311, 230);
+	// create a new animation of the bird flapping
+	std::vector<std::string>ids;
+	ids.push_back("player");
+	ids.push_back("player2");
+	ids.push_back("player3");
+	spriteManager.createAnimation("player", ids);
 
-	spriteManager.newSprite("flappyBird", "sheet.png", 192, 44, 118, 228);
-	spriteManager.newSprite("getReady", "sheet.png", 174, 44, 118, 310);
-	spriteManager.newSprite("menu", "sheet.png", 118, 122, 0, 228);
+	spriteManager.newSprite("background", "Sprites/sheet.png", 275, 111, 0, 0);
+	spriteManager.newSprite("ground", "Sprites/sheet.png", 225, 110, 275, 0);
+	spriteManager.newSprite("pipeTop", "Sprites/sheet.png", 54, 400, 552, 0);
+	spriteManager.newSprite("pipeBottom", "Sprites/sheet.png", 52, 400, 502, 0);
+	spriteManager.newSprite("pipeTop2", "Sprites/sheet.png", 54, 400, 552, 0);
+	spriteManager.newSprite("pipeBottom2", "Sprites/sheet.png", 52, 400, 502, 0);
 
-	spriteManager.newSprite("gameOver", "sheet.png", 192, 38, 118, 272);
-	spriteManager.newSprite("scoreScreen", "sheet.png", 227, 115, 275, 111);
-	
+
+	spriteManager.newSprite("flappyBird", "Sprites/sheet.png", 192, 44, 118, 228);
+	spriteManager.newSprite("getReady", "Sprites/sheet.png", 174, 44, 118, 310);
+	spriteManager.newSprite("menu", "Sprites/sheet.png", 118, 122, 0, 228);
+
+	spriteManager.newSprite("gameOver", "Sprites/sheet.png", 192, 38, 118, 272);
+	spriteManager.newSprite("scoreScreen", "Sprites/sheet.png", 227, 115, 275, 111);
+	spriteManager.newSprite("coinWhite", "Sprites/sheet.png", 44, 45, 348, 228);
+	spriteManager.newSprite("coinSilver", "Sprites/sheet.png", 44, 45, 397, 228);
+	spriteManager.newSprite("coinBronze", "Sprites/sheet.png", 44, 45, 397, 274);
+	spriteManager.newSprite("coinGold", "Sprites/sheet.png", 44, 45, 348, 274);
+}
+
+// loads font objects
+void MainGame::loadFonts() {
+	int textColor[3] = {255, 255, 255};
+
+	// create font for displaying score whilst playing
+	spriteManager.newFont("fps", "Fonts/DroidSansMono.ttf", 20, "FPS: " + std::to_string(limiter.end()), textColor);
+
+	// create font for displaying score whilst playing
+	spriteManager.newFont("score", "Fonts/DroidSansMono.ttf", 30, "Score: " + std::to_string(score), textColor);
+
+	// create fonts for game over
+	spriteManager.newFont("scoreMenu", "Fonts/SF_Arch/SF_Arch_Rival.ttf", 20, "Score: " + std::to_string(score), textColor);
+	spriteManager.newFont("highScoreMenu", "Fonts/SF_Arch/SF_Arch_Rival.ttf", 20, "Highscore: " + std::to_string(highScore), textColor);
 }
 
 // main game loop
 void MainGame::run() {
 	init();
 
-	limiter.setMaxFPS(100);
+	limiter.setMaxFPS(60);
 	while (running) {
-		limiter.begin();
+
+		// get user input
+		processInput();
 		update();
-		limiter.end();
+
+		limiter.begin();
+
 		render();
+
 	}
 }
 
@@ -121,11 +158,14 @@ void MainGame::processInput() {
 	if (inputManager.isMousePressed() || inputManager.isKeyPressed(0x20)) { // SPACE
 		if (state == PLAYING) {
 			acceleration += 5;
+			if(player.getAngle() > -50)
+				player.decreaseAngle(20);
 		}
 		if (state == MENU) {
 			acceleration = maxAcceleration;
 			inputManager.releaseKey(0x20);
 			inputManager.releaseMouseButton();
+			audioManager.playSound("coin");
 			state = PLAYING;
 		}
 		if (state == GAME_OVER) {
@@ -134,6 +174,7 @@ void MainGame::processInput() {
 			resetPipes();
 			inputManager.releaseKey(0x20);
 			inputManager.releaseMouseButton();
+			audioManager.playSound("next");
 			state = MENU;
 		}
 	}
@@ -146,35 +187,34 @@ void MainGame::processInput() {
 	}
 
 	// keys for audio
-	if (inputManager.isKeyPressed('1')) {
-		audioManager.playSound("scratch");
-		inputManager.releaseKey('1');
-	}
-	if (inputManager.isKeyPressed('2')) {
-		audioManager.playSound("high");
-		inputManager.releaseKey('2');
-	}
-	if (inputManager.isKeyPressed('3')) {
-		audioManager.playSound("medium");
-		inputManager.releaseKey('3');
-	}
-	if (inputManager.isKeyPressed('4')) {
-		audioManager.playSound("low");
-		inputManager.releaseKey('4');
-	}
 	if (inputManager.isKeyPressed('5')) {
-		audioManager.playSong("beat");
+		audioManager.playSong("Kids_Music_3");
 		inputManager.releaseKey('5');
 	}
 	if (inputManager.isKeyPressed('6')) {
 		audioManager.playSong("stop");
 		inputManager.releaseKey('6');
 	}
+	if (inputManager.isKeyPressed('+')) {
+		audioManager.increaseMusicVolume();
+		inputManager.releaseKey('+');
+	}
+	if (inputManager.isKeyPressed('-')) {
+		audioManager.lowerMusicVolume();
+		inputManager.releaseKey('-');
+	}
+	if (inputManager.isKeyPressed('<')) {
+		audioManager.increaseSoundFXVolume();
+		inputManager.releaseKey('<');
+	}
+	if (inputManager.isKeyPressed('z')) {
+		audioManager.lowerSoundFXVolume();
+		inputManager.releaseKey('z');
+	}
 }
 
+// update game logic
 void MainGame::update() {
-	// get user input
-	processInput();
 
 	if (state == PLAYING) {
 		// clear the vector of objects to render
@@ -185,6 +225,9 @@ void MainGame::update() {
 		if (acceleration > maxAcceleration) {
 			acceleration = maxAcceleration;
 		}
+
+		if(player.getAngle() < 50)
+			player.increaseAngle(4);
 
 		// set player position
 		player.setPosY(player.getPosY() - acceleration);
@@ -200,13 +243,26 @@ void MainGame::update() {
 		// set score
 		int width = spriteManager.getSpriteWidth("pipeTop");
 		if (player.getPosX() >= pipeTop.getPosX() + width && passedPipe == false) {
+			audioManager.playSound("coin");
 			score++;
+			if (score > highScore) {
+				highScore = score;
+			}
 			passedPipe = true;
 		}
 		if (player.getPosX() >= pipeTop2.getPosX() + width && passedPipe2 == false) {
+			audioManager.playSound("coin");
 			score++;
+			if (score > highScore) {
+				highScore = score;
+			}
 			passedPipe2 = true;
 		}
+
+		// update scoreTexture
+		int textColor[3]{ 0,0,0 };
+		spriteManager.updateFont("score", "Score: " + std::to_string(score), textColor);
+
 
 
 		// reset pipes
@@ -272,6 +328,7 @@ void MainGame::checkCollision() {
 	if (player.getPosY() + height > window.getScreenHeight() - height2) {
 		std::cout << "Collided Bottom!" << std::endl;
 		if (!godMode) {
+			audioManager.playSound("death");
 			state = GAME_OVER;
 		}
 	}
@@ -280,6 +337,7 @@ void MainGame::checkCollision() {
 	if (player.getPosY() < 0) {
 		std::cout << "Collided Top!" << std::endl;
 		if (!godMode) {
+			audioManager.playSound("death");
 			state = GAME_OVER;
 		}
 	}
@@ -291,10 +349,11 @@ void MainGame::checkCollision() {
 	height2 = spriteManager.getSpriteHeight("pipeTop");
 	width2 = spriteManager.getSpriteWidth("pipeTop");
 
-	if (player.getPosX() + width/2 >= pipeTop.getPosX() && player.getPosX() <= pipeTop.getPosX() + width2) {
+	if (player.getPosX() + width / 2 >= pipeTop.getPosX() && player.getPosX() <= pipeTop.getPosX() + width2) {
 		if (player.getPosY() <= (pipeTop.getPosY() + height2)) {
 			std::cout << "Collided With Top Pipe!" << std::endl;
 			if (!godMode) {
+				audioManager.playSound("death");
 				state = GAME_OVER;
 			}
 		}
@@ -306,10 +365,11 @@ void MainGame::checkCollision() {
 	height2 = spriteManager.getSpriteHeight("pipeBottom");
 	width2 = spriteManager.getSpriteWidth("pipeBottom");
 
-	if (player.getPosX() + width/2 >= pipeBottom.getPosX() && player.getPosX() <= pipeBottom.getPosX() + width2) {
+	if (player.getPosX() + width / 2 >= pipeBottom.getPosX() && player.getPosX() <= pipeBottom.getPosX() + width2) {
 		if (player.getPosY() + height >= pipeBottom.getPosY()) {
 			std::cout << "Collided With pipeBottom!" << std::endl;
 			if (!godMode) {
+				audioManager.playSound("death");
 				state = GAME_OVER;
 			}
 		}
@@ -321,10 +381,11 @@ void MainGame::checkCollision() {
 	height2 = spriteManager.getSpriteHeight("pipeTop2");
 	width2 = spriteManager.getSpriteWidth("pipeTop2");
 
-	if (player.getPosX() + width/2 >= pipeTop2.getPosX() && player.getPosX() <= pipeTop2.getPosX() + width2) {
+	if (player.getPosX() + width / 2 >= pipeTop2.getPosX() && player.getPosX() <= pipeTop2.getPosX() + width2) {
 		if (player.getPosY() <= (pipeTop2.getPosY() + height2)) {
 			std::cout << "Collided With pipeTop2!" << std::endl;
 			if (!godMode) {
+				audioManager.playSound("death");
 				state = GAME_OVER;
 			}
 		}
@@ -336,10 +397,11 @@ void MainGame::checkCollision() {
 	height2 = spriteManager.getSpriteHeight("pipeBottom2");
 	width2 = spriteManager.getSpriteWidth("pipeBottom2");
 
-	if (player.getPosX() + width/2 >= pipeBottom2.getPosX() && player.getPosX() <= pipeBottom2.getPosX() + width2) {
-		if (player.getPosY()+height >= pipeBottom2.getPosY()) {
+	if (player.getPosX() + width / 2 >= pipeBottom2.getPosX() && player.getPosX() <= pipeBottom2.getPosX() + width2) {
+		if (player.getPosY() + height >= pipeBottom2.getPosY()) {
 			std::cout << "Collided With pipeBottom2!" << std::endl;
 			if (!godMode) {
+				audioManager.playSound("death");
 				state = GAME_OVER;
 			}
 		}
@@ -348,7 +410,9 @@ void MainGame::checkCollision() {
 
 // renders items to the window
 void MainGame::render() {
+	// varibles for positioning the sprites
 	int height, width, counter;
+
 	//Clear screen
 	spriteManager.SetRenderDrawColor(111, 170, 230, 255);
 	spriteManager.RenderClear();
@@ -358,7 +422,7 @@ void MainGame::render() {
 	height = spriteManager.getSpriteHeight("background");
 	width = spriteManager.getSpriteWidth("background");
 	while (counter < window.getScreenWidth()) {
-		spriteManager.render(counter, window.getScreenHeight() - (height*2), "background");
+		spriteManager.render(counter, window.getScreenHeight() - (height * 2), 0.0, "background");
 		counter += width;
 	}
 
@@ -367,50 +431,83 @@ void MainGame::render() {
 	height = spriteManager.getSpriteHeight("ground");
 	width = spriteManager.getSpriteWidth("ground");
 	while (counter < window.getScreenWidth()) {
-		spriteManager.render(counter, window.getScreenHeight() - height, "ground");
+		spriteManager.render(counter, window.getScreenHeight() - height, 0.0, "ground");
 		counter += width;
 	}
 
 
-
+	// gamestate == playing, render the game
 	if (state == PLAYING) {
 		if (renderables.size() != 0) {
 			int priority = BACKGROUND;
 			while (priority >= 0) {
 				for (int i = 0; i < renderables.size(); i++) {
 					if (renderables[i].getPriority() == priority) {
-						spriteManager.render(renderables[i].getPosX(), renderables[i].getPosY(), renderables[i].getID());
+						if (renderables[i].getID() == "player") {
+							spriteManager.renderAnimation("player", renderables[i].getPosX(), renderables[i].getPosY(), renderables[i].getAngle());
+						}
+						else {
+							spriteManager.render(renderables[i].getPosX(), renderables[i].getPosY(), renderables[i].getAngle(), renderables[i].getID());
+						}
 					}
 				}
 				priority--;
 			}
 		}
-		
-		std::cout << "SCORE: " << score << std::endl;
 
+		// render score & highscore
+		spriteManager.render(window.getScreenWidth()-100, 10, 0, "score");
 	}
 
+	// if gamestate == MENU render the menu
 	if (state == MENU) {
 		width = spriteManager.getSpriteWidth("flappyBird");
-		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), window.getScreenHeight() / 8, "flappyBird");
-		
+		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), window.getScreenHeight() / 8, 0.0, "flappyBird");
+
 		width = spriteManager.getSpriteWidth("getReady");
-		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), window.getScreenHeight() / 3, "getReady");
+		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), window.getScreenHeight() / 3, 0.0, "getReady");
 
 		width = spriteManager.getSpriteWidth("menu");
-		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), window.getScreenHeight() / 2, "menu");
-
+		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), window.getScreenHeight() / 2, 0.0, "menu");
 	}
 
+	// if gamestate == GAME_OVER render game over menu
 	if (state == GAME_OVER) {
 		width = spriteManager.getSpriteWidth("gameOver");
-		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), window.getScreenHeight() / 5, "gameOver");
+		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), window.getScreenHeight() / 5, 0.0, "gameOver");
 
 		height = spriteManager.getSpriteHeight("scoreScreen");
 		width = spriteManager.getSpriteWidth("scoreScreen");
-		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), (window.getScreenHeight() / 3) + height / 2, "scoreScreen");
+		spriteManager.render((window.getScreenWidth() / 2) - (width / 2), (window.getScreenHeight() / 3) + height / 2, 0.0, "scoreScreen");
 
+		height = 267;
+		width = 115;
+		if (score < 5) {
+			spriteManager.render(width, height, 0.0, "coinWhite");
+		}
+		if (score > 4 && score < 10) {
+			spriteManager.render(width, height, 0.0, "coinBronze");
+		}
+		if (score > 9 && score < 15) {
+			spriteManager.render(width, height, 0.0, "coinSilver");
+		}
+		if (score > 14 && score < 20) {
+			spriteManager.render(width, height, 0.0, "coinGold");
+		}
+
+		// update the score textures
+		int textColor[3] = {0, 0, 0};
+		spriteManager.updateFont("scoreMenu", std::to_string(score), textColor);
+		spriteManager.updateFont("highScoreMenu", std::to_string(highScore), textColor);
+
+		// render score & highscore
+		spriteManager.render(window.getScreenWidth()/2+70, 254, 0, "scoreMenu");
+		spriteManager.render(window.getScreenWidth()/2+70, 298, 0, "highScoreMenu");
 	}
+
+	int textColor[3] = { 0, 0, 0 };
+	spriteManager.updateFont("fps", std::to_string(limiter.end()), textColor);
+	spriteManager.render(10, 10, 0, "fps");
 
 	//Update screen
 	spriteManager.RenderPresent();
@@ -418,7 +515,7 @@ void MainGame::render() {
 
 // reset player position
 void MainGame::resetPlayer() {
-	player = GameObject("player", window.getScreenWidth() / 8, window.getScreenHeight() / 2, true, PLAYER);
+	player = GameObject("player", window.getScreenWidth() / 8, window.getScreenHeight() / 2, -60, true, PLAYER);
 }
 
 // reset pipes position
@@ -426,12 +523,12 @@ void MainGame::resetPipes() {
 	// seed random number for the height of the pipes
 	srand(time(NULL));
 	int newHeight = rand() % 200 + 150;
-	pipeTop = GameObject("pipeTop", window.getScreenWidth(), -newHeight, true, FOREGROUND);
-	pipeBottom = GameObject("pipeBottom", window.getScreenWidth(), -newHeight + 500, true, FOREGROUND);
+	pipeTop = GameObject("pipeTop", window.getScreenWidth(), -newHeight, 0.0, true, FOREGROUND);
+	pipeBottom = GameObject("pipeBottom", window.getScreenWidth(), -newHeight + 500, 0.0, true, FOREGROUND);
 	passedPipe = false;
 
 	newHeight = rand() % 200 + 150;
-	pipeTop2 = GameObject("pipeTop2", pipeTop.getPosX() + 300, -newHeight, true, FOREGROUND);
-	pipeBottom2 = GameObject("pipeBottom2", pipeTop.getPosX() + 300, -newHeight + 500, true, FOREGROUND);
+	pipeTop2 = GameObject("pipeTop2", pipeTop.getPosX() + 300, -newHeight, 0.0, true, FOREGROUND);
+	pipeBottom2 = GameObject("pipeBottom2", pipeTop.getPosX() + 300, -newHeight + 500, 0.0, true, FOREGROUND);
 	passedPipe2 = false;
 }
