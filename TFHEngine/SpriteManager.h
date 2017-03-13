@@ -38,7 +38,6 @@ public:
 
 	// renderer functions
 	void SetRenderDrawColor(int r, int g, int b, int a);
-	void SetVSYN(bool vsync);
 	void RenderClear();
 	void RenderPresent();
 
