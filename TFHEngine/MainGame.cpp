@@ -262,7 +262,7 @@ void MainGame::update() {
 		}
 
 		// update scoreTexture
-		int textColor[3]{ 0,0,0 };
+		int textColor[3] = { 0,0,0 };
 		spriteManager.updateFontTexture("score_texture", "score_font", "Score: " + std::to_string(score), textColor);
 
 
@@ -296,24 +296,25 @@ void MainGame::update() {
 		// put game objects in to vector of items to render
 		renderables.push_back(player);
 
+		int cullDistance = 500;
 		// limit renderable objects by their vicinity to the viewport
-		if (pipeTop.getPosX() > -1000 && pipeTop.getPosX() < window.getScreenWidth() + 1000) {
-			if (pipeTop.getPosY() > -1000 && pipeTop.getPosY() < window.getScreenHeight() + 1000) {
+		if (pipeTop.getPosX() > -cullDistance && pipeTop.getPosX() < window.getScreenWidth() + cullDistance) {
+			if (pipeTop.getPosY() > -cullDistance && pipeTop.getPosY() < window.getScreenHeight() + cullDistance) {
 				renderables.push_back(pipeTop);
 			}
 		}
-		if (pipeBottom.getPosX() > -1000 && pipeBottom.getPosX() < window.getScreenWidth() + 1000) {
-			if (pipeBottom.getPosY() > -1000 && pipeBottom.getPosY() < window.getScreenHeight() + 1000) {
+		if (pipeBottom.getPosX() > -cullDistance && pipeBottom.getPosX() < window.getScreenWidth() + cullDistance) {
+			if (pipeBottom.getPosY() > -cullDistance && pipeBottom.getPosY() < window.getScreenHeight() + cullDistance) {
 				renderables.push_back(pipeBottom);
 			}
 		}
-		if (pipeTop2.getPosX() > -1000 && pipeTop.getPosX() < window.getScreenWidth() + 1000) {
-			if (pipeTop.getPosY() > -1000 && pipeTop.getPosY() < window.getScreenHeight() + 1000) {
+		if (pipeTop2.getPosX() > -cullDistance && pipeTop.getPosX() < window.getScreenWidth() + cullDistance) {
+			if (pipeTop.getPosY() > -cullDistance && pipeTop.getPosY() < window.getScreenHeight() + cullDistance) {
 				renderables.push_back(pipeTop2);
 			}
 		}
-		if (pipeBottom2.getPosX() > -1000 && pipeBottom2.getPosX() < window.getScreenWidth() + 1000) {
-			if (pipeBottom2.getPosY() > -1000 && pipeBottom2.getPosY() < window.getScreenHeight() + 1000) {
+		if (pipeBottom2.getPosX() > -cullDistance && pipeBottom2.getPosX() < window.getScreenWidth() + cullDistance) {
+			if (pipeBottom2.getPosY() > -cullDistance && pipeBottom2.getPosY() < window.getScreenHeight() + cullDistance) {
 				renderables.push_back(pipeBottom2);
 			}
 		}
