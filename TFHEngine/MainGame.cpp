@@ -189,6 +189,10 @@ void MainGame::processInput() {
 	}
 
 	// keys for audio
+	if (inputManager.isKeyPressed('4')) {
+		audioManager.setSoundOverlap();
+		inputManager.releaseKey('4');
+	}
 	if (inputManager.isKeyPressed('5')) {
 		audioManager.playSong("Kids_Music_3");
 		inputManager.releaseKey('5');
