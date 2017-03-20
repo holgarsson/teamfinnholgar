@@ -26,16 +26,19 @@ public:
 	void playSong(std::string id);
 
 	// volume functions
+	void setSoundOverlap();
 	void setSoundFXVolume(int channel, int volume);
 	void setMusicVolume(int volume);
 	void increaseSoundFXVolume();
 	void increaseMusicVolume();
 	void lowerSoundFXVolume();
 	void lowerMusicVolume();
+	bool getSoundOverlap();
 	int getSoundFXVolume();
 	int getMusicVolume();
 
 private:
+	bool soundOverlap;
 	// audio vectors
 	std::vector<Song*>songList;
 	std::vector<SoundEffect*>soundFX;

@@ -7,6 +7,7 @@ AudioManager::AudioManager() {
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
 		printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
 	}
+	soundOverlap = false;
 }
 
 // destructor
@@ -52,7 +53,7 @@ bool AudioManager::loadSong(std::string id, char fileName[]) {
 void AudioManager::playSound(std::string id) {
 	for (int i = 0; i < soundFX.size(); i++) {
 		if (soundFX[i]->getID() == id) {
-			if (Mix_Playing(1)) {
+			if (!soundOverlap && Mix_Playing(1)) {
 				break;
 			}
 			else {
@@ -102,6 +103,21 @@ void AudioManager::setMusicVolume(int volume) {
 // set volume for sound effects, 0-128
 void AudioManager::setSoundFXVolume(int channel, int volume) {
 	Mix_Volume(channel, volume);
+}
+
+
+void AudioManager::setSoundOverlap() {
+	if (soundOverlap) {
+		soundOverlap = false;
+	}
+	else {
+		soundOverlap = true;
+	}
+}
+
+
+bool AudioManager::getSoundOverlap() {
+	return soundOverlap;
 }
 
 // get volume level
