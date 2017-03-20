@@ -9,7 +9,7 @@ SoundEffect::SoundEffect(std::string id, char fileName[]){
 
 // destructor
 SoundEffect::~SoundEffect(){
-	sound = NULL;
+	Mix_FreeChunk(sound);
 }
 
 // sets the id of the sound
