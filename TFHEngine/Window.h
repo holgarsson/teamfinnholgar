@@ -16,7 +16,7 @@ public:
 	void close();
 
 	// creates a new window
-	int create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentFlags);
+	void create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentFlags);
 
 	// returns window dimensions
 	int getScreenWidth();
