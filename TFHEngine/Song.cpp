@@ -10,6 +10,7 @@ Song::Song(std::string id, char fileName[]){
 // detructor
 Song::~Song(){
 	Mix_FreeMusic(song);
+	song = NULL;
 }
 
 // sets the song id

@@ -4,9 +4,12 @@
 // constructor
 Window::Window()
 {
+	if (!SDL_Init(SDL_INIT_VIDEO)) {
+		Error("Failed to initialize SDL_Video!");
+	}
 	// Set texture filtering to linear
 	if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
-		printf("Warning: Linear texture filtering not enabled!");
+		Error("Warning: Linear texture filtering not enabled!");
 	}
 }
 
