@@ -19,9 +19,11 @@ void AudioManager::close() {
 	for (int i = 0; i < songList.size(); i++) {
 		songList[i]->~Song();
 	}
+	songList.clear();
 	for (int i = 0; i < soundFX.size(); i++) {
 		soundFX[i]->~SoundEffect();
 	}
+	soundFX.clear();
 	Mix_Quit();
 }
 
