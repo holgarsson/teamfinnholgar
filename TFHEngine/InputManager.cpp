@@ -1,7 +1,5 @@
 #include "InputManager.h"
 #include <SDL.h>
-#include <chrono>
-#include <thread>
 
 // constructor
 InputManager::InputManager()

@@ -22,7 +22,7 @@ void Song::setID(std::string _id) {
 void Song::setSong(char fileName[]) {
 	song = Mix_LoadMUS(fileName);
 	if (song == NULL){
-		fatalError("Failed to load music! SDL_mixer Error: %s\n");
+		Error("Failed to load music! SDL_mixer Error: %s\n");
 	}
 }
 
